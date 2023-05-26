@@ -1,9 +1,34 @@
+import { useNavigate } from 'react-router-dom'
 import { Box, TextField, Typography } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
-import React from 'react'
+import { useForm } from '../../hooks/useForm'
+import LoginFormSchema from './LoginFormSchema'
+import { loginUser } from '../../utils/apiCore'
 import styles from './styles'
 
+const initialValues = {
+  email: '',
+  password: ''
+}
+
 export const LoginScreen = () => {
+  const navigate = useNavigate()
+
+  const handleLogin = async (values) => {
+    await loginUser(values)
+    .then(() => {
+      navigate('/home')
+    })
+  }
+
+  const loginForm = useForm({
+    initialValues,
+    validationForm: LoginFormSchema,
+    submitFunction: handleLogin
+  })
+
+  const { errors, handleChange, values, handleSubmit, loading } = loginForm
+
   return (
     <Box sx={styles.container}>
       <Box sx={styles.loginContainer}>
@@ -19,26 +44,37 @@ export const LoginScreen = () => {
           <TextField
             fullWidth
             type='text'
-            id='name'
-            name={'name'}
-            label='Nombre de usuario'
+            id='email'
+            name='email'
+            label='Email'
             variant='outlined'
+            autoComplete="off"
+            value={values.email}
+            error={errors.email}
+            helperText={errors.email}
+            onChange={handleChange}
             sx={styles.input}
           />
           <TextField
             fullWidth
             type='password'
-            id='name'
-            name={'name'}
-            label='Nombre de usuario'
+            id='password'
+            name='password'
+            label='Contraseña'
             variant='outlined'
+            autoComplete="off"
+            value={values.password}
+            error={errors.password}
+            helperText={errors.password}
+            onChange={handleChange}
             sx={styles.input}
           />
         </Box>
         <Box sx={styles.btnContainer}>
           <LoadingButton
+            loading={loading}
             variant='contained'
-            color='secondary'
+            onClick={handleSubmit}
             sx={styles.btn}
           >
             Login
